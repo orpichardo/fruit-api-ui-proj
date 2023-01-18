@@ -1,13 +1,11 @@
 import { useEffect, useState } from 'react'
-import axios from 'axios';
+import Nav from './Nav.jsx';
 import './App.css';
 
 function App() {
   const [fruits, setFruits] = useState([])
   const [fruit, setFruit] = useState({})
-  const [display, setDisplay] = useState(false)
-  const [fruitImage, setFruitImage] = useState("")
-
+  let [modalToggle, setModalToggle] = useState(false)
 
   useEffect(() => {
     apiCall()
@@ -15,47 +13,57 @@ function App() {
 
   function apiCall() {
     fetch("https://project2-production.up.railway.app/fruits")
-      .then((res) => res.json())
-      .then((data) => setFruits(data))
+     
+    
+    .then((res) => res.json())
+    .then((data) => setFruits(data))
+  }
+  
+
+
+  function display() {
+    setModalToggle(prev => !prev)
   }
 
-  const handleClick = async (fruitName) => {
-    const response = await axios(`https://api.giphy.com/v1/gifs/search?api_key=APIKEY&q=${fruitName}`)
-    setFruitImage(response.data.data[0].images.original.url)
-    setDisplay(prev => !prev)
+  function handleClick(fruInfo) {
+    setFruit(fruInfo)
+    display()
   }
-
 
   return (
     <div className="App">
-
-      <div className="fruits-list">
-        {fruits.map((fruit) => (
-          // <div className="fruit-container" onClick={() =}
-
-          // <div className="modal">
-          <div onClick={() => handleClick(fruit.name)} className="info" key={fruit._id}>
-            <h1>{fruit.name}</h1>
-            <p>{fruit.genus}</p>
-            <p>{fruit.family}</p>
-            <p>{fruit.order}</p>
-            <p>{fruit.nutrition.carbohydrates}</p>
-            <p>Protein: {fruit.nutrition.protein}</p>
-            <p>{fruit.nutrition.fat}</p>
-            <p>{fruit.nutrition.calories}</p>
-            <p>{fruit.nutrition.suger}</p>
+      <Nav />
+      <div className="fruit-list">
+        {fruits.map((fruit, index) => (
+          <div className="fruit-container" onClick={() => handleClick(fruit)} key={index}>
+            
+            <h5>{fruit.name}</h5>
           </div>
         ))}
-        {display && (
-          <div>
-            <img src={fruitImage} />
-          </div>
-        )}
       </div>
+      {modalToggle ?
+        <div className="modal">
+          <div className="modal-content">
+            <div className="info">
+            <h1>{fruit.name}</h1>
+                    <p>Genus: {fruit.genus}</p>
+                    <p>Family {fruit.family}</p>
+              <p>Order: {fruit.order}</p>
+              <p>Carbs: {fruit.nutrition.carbohydrates}</p>
+              <p>Protein: {fruit.nutrition.protein}</p>
+                    <p>Fat: {fruit.nutrition.fat}</p>
+                    <p>Calories: {fruit.nutrition.calories}</p>
+                    <p>Sugar: {fruit.nutrition.sugar}</p>
+              <button onClick={display}>x</button>
+              </div>
+        </div>
+          </div>
+        
+        :
+        null
+      }
     </div>
-
   );
-
 }
 
 export default App;
